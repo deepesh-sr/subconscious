@@ -4,6 +4,7 @@ const app = express();
 import * as z from "zod";
 import dotenv from '@dotenvx/dotenvx'
 import User from "./database/db.js";
+import * as bcrypt from "bcrypt"
 
 dotenv.config();
 
@@ -47,7 +48,7 @@ app.post('/signup', async (req, res) => {
 
         const result = user.safeParse(req.body);
         if (result.success) {
-            console.log(result.data);
+
             
             
             let username = req.body.username;
@@ -63,10 +64,12 @@ app.post('/signup', async (req, res) => {
                 })
             }
             
-            
+            const hashedPassword = await bcrypt.hash(password,3);
+
+             
             const newuser =  new User({
                 username : username,
-                password : password
+                password : hashedPassword
             })
             
             const saveResult = await newuser.save();
