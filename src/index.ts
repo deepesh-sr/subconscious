@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const app = express();
 import * as z from "zod";
 import dotenv from '@dotenvx/dotenvx'
+import User from "./database/db.js";
 
 dotenv.config();
 
@@ -40,14 +41,54 @@ const user = z.object({
 })
 
 
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
+   
+    try{
 
-    const result = user.safeParse(req.body);
-    if (!result.success) {
-        console.log(result.error)
-    } else {
-        console.log(result.data)
+        const result = user.safeParse(req.body);
+        if (result.success) {
+            console.log(result.data);
+            
+            
+            let username = req.body.username;
+            let password = req.body.password;
+            
+            const findUser =await User.findOne({
+                username : username
+            });
+            
+            if ( findUser){
+                res.status(403).json({
+                    "msg" : "User already exists"
+                })
+            }
+            
+            
+            const newuser =  new User({
+                username : username,
+                password : password
+            })
+            
+            const saveResult = await newuser.save();
+            if ( saveResult) {
+                res.status(200).json({"msg" : "Signed up"})
+            }
+            
+        } else {
+            
+            console.log(result.error)
+            res.status(411).json({
+                "msg" : "Error in inputs"
+            })
+        }
+        
+    }catch(e){
+        console.error(e);
+        res.status(500).json({
+            "msg" : "server error"
+        })
     }
 
 
+    
 })
