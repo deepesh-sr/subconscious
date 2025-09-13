@@ -1,0 +1,13 @@
+# Build outputs
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+dist/
+build/
+lib/
+
+# Dependencies
+node_modules/
+
+.env
