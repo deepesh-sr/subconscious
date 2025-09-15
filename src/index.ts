@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const app = express();
 import * as z from "zod";
 import dotenv from '@dotenvx/dotenvx'
-import User from "./database/db.js";
+import {User, Content, ContentType} from "./database/db.js";
 import * as bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
 import authenticateToken from "./middleware/authenticate.js";
@@ -44,6 +44,19 @@ const user = z.object({
         .refine((p) => /[0-9]/.test(p))
         .refine((p) => /[!@#$%^&*]/.test(p))
 })
+const content = z.object({
+    contentType: z.enum(["document", "tweet", "link", "youtube"]),
+    link: z.string().url("Must be a valid URL"),
+    title: z.string().min(1, "Title is required"),
+    tags: z.array(z.string()).optional()
+})
+
+// console.log(content.safeParse({
+//     contentType : "link",
+//     link : "adsfdsf",
+//     title : "firstcontent",
+//     tags : "aalo ke chaalu beta"
+// }))
 
 
 app.post('/signup', async (req, res) => {
@@ -151,4 +164,39 @@ app.get('/profile', authenticateToken, (req: any, res) => {
         msg: "Protected route accessed",
         user: req.user
     })
+})
+
+app.post('/add-content', authenticateToken, async (req: any, res) => {
+    try {
+        const result = content.safeParse(req.body);
+
+        if (result.success) {
+            const { contentType, link, title, tags } = result.data;
+            
+            const newContent = new Content({
+                contentType,
+                link,
+                title,
+                tags: tags || []
+            });
+            
+            await newContent.save();
+            
+            res.status(201).json({
+                msg: "Content added successfully",
+                content: newContent,
+                user: req.user.username
+            });
+        } else {
+            res.status(400).json({
+                msg: "Invalid input data",
+                errors: result.error.issues
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            msg: "Server error while adding content"
+        });
+    }
 })

@@ -13,6 +13,23 @@ const userSchema = new Schema({
     }
 })
 
-const User = model ('User', userSchema);
+export enum ContentType {
+    Document = "document",
+    Tweet = "tweet", 
+    Youtube = "youtube",
+    Link = "link"
+}
 
-export default User;
+const contentSchema = new Schema({
+    contentType: {
+        type: String,
+        enum: Object.values(ContentType),
+        required: true
+    },
+    link: String,
+    title: String,
+    tags: [String] // Array of strings for multiple tags
+})
+
+export const User = model ('User', userSchema);
+export const Content = model ('Content', contentSchema);

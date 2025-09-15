@@ -1,6 +1,5 @@
-import express from 'express';
 import jwt from 'jsonwebtoken'
-import User from '../database/db.js';
+
 
 const authenticateToken = async (req: any, res: any, next: any) => {
     try {
