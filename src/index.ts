@@ -6,6 +6,7 @@ import dotenv from '@dotenvx/dotenvx'
 import User from "./database/db.js";
 import * as bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
+import authenticateToken from "./middleware/authenticate.js";
 
 
 
@@ -143,4 +144,11 @@ try{
         "msg" : "internal server error"
     })
 }
+})
+
+app.get('/profile', authenticateToken, (req: any, res) => {
+    res.json({
+        msg: "Protected route accessed",
+        user: req.user
+    })
 })
