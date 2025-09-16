@@ -46,17 +46,13 @@ const user = z.object({
 })
 const content = z.object({
     contentType: z.enum(["document", "tweet", "link", "youtube"]),
-    link: z.string().url("Must be a valid URL"),
+    link: z.string(),
     title: z.string().min(1, "Title is required"),
-    tags: z.array(z.string()).optional()
+    tags: z.array(z.string()).optional(),
+    
 })
 
-// console.log(content.safeParse({
-//     contentType : "link",
-//     link : "adsfdsf",
-//     title : "firstcontent",
-//     tags : "aalo ke chaalu beta"
-// }))
+
 
 
 app.post('/signup', async (req, res) => {
@@ -177,7 +173,8 @@ app.post('/add-content', authenticateToken, async (req: any, res) => {
                 contentType,
                 link,
                 title,
-                tags: tags || []
+                tags: tags || [],
+                userId : req.user.username
             });
             
             await newContent.save();
@@ -200,3 +197,25 @@ app.post('/add-content', authenticateToken, async (req: any, res) => {
         });
     }
 })
+
+app.get('/get-content', authenticateToken,async (req : any,res)=>{
+
+    const content = await Content.find({
+        userId : req.user.username
+    })
+
+    res.json({
+        msg : `Content for ${req.user.username}`,
+        content : content
+    })
+})
+
+app.put('/delete', authenticateToken , async( req : any , res ) =>{
+    const content = await Content.deleteMany({
+        userId : req.user.username
+    })
+    res.json({
+        msg : "all content deleted"
+    })
+})
+// get content - populate 

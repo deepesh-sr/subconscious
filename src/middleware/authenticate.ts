@@ -1,7 +1,8 @@
+import type { Request,Response,NextFunction } from 'express';
 import jwt from 'jsonwebtoken'
 
 
-const authenticateToken = async (req: any, res: any, next: any) => {
+const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // Extract token from Authorization header: "Bearer <token>"
         const token = req.headers['authorization'];
@@ -18,6 +19,7 @@ const authenticateToken = async (req: any, res: any, next: any) => {
         }
         
         const decoded = jwt.verify(token, jwtSecret);
+        // @ts-ignore
         req.user = decoded; // Attach user info to request
         next(); // Continue to next middleware/route
         

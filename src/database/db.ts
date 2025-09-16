@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 // userSchema 
 const userSchema = new Schema({
@@ -28,7 +28,8 @@ const contentSchema = new Schema({
     },
     link: String,
     title: String,
-    tags: [String] // Array of strings for multiple tags
+    tags: [String], 
+    userId : {type : String, ref : 'User', required : true}
 })
 
 export const User = model ('User', userSchema);
