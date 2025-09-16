@@ -55,7 +55,7 @@ const content = z.object({
 
 
 
-app.post('/signup', async (req, res) => {
+app.post('/api/vi/signup', async (req, res) => {
 
     try {
 
@@ -109,7 +109,7 @@ app.post('/signup', async (req, res) => {
 
 })
 
-app.post('/signin', async (req, res) => {
+app.post('/api/vi/signin', async (req, res) => {
 try{
 
 
@@ -155,14 +155,14 @@ try{
 }
 })
 
-app.get('/profile', authenticateToken, (req: any, res) => {
+app.get('/api/vi/profile', authenticateToken, (req: any, res) => {
     res.json({
         msg: "Protected route accessed",
         user: req.user
     })
 })
 
-app.post('/add-content', authenticateToken, async (req: any, res) => {
+app.post('/api/vi/add-content', authenticateToken, async (req: any, res) => {
     try {
         const result = content.safeParse(req.body);
 
