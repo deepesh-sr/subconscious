@@ -1,5 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 
+
 // userSchema 
 const userSchema = new Schema({
     username : {
@@ -32,5 +33,14 @@ const contentSchema = new Schema({
     userId : {type : String, ref : 'User', required : true}
 })
 
+const linkSchema = new Schema({
+    hash : {
+        type : String, 
+        unique : true
+    },
+    userId : {type : String, ref : 'User' , required : true}
+})
+
 export const User = model ('User', userSchema);
 export const Content = model ('Content', contentSchema);
+export const Link = model('linkSchema',linkSchema);

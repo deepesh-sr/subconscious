@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 const app = express();
 import * as z from "zod";
 import dotenv from '@dotenvx/dotenvx'
-import {User, Content, ContentType} from "./database/db.js";
+import { User, Content, ContentType, Link } from "./database/db.js";
 import * as bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
 import authenticateToken from "./middleware/authenticate.js";
-
+import random from "./utils.js";
 
 
 dotenv.config();
@@ -49,11 +49,11 @@ const content = z.object({
     link: z.string(),
     title: z.string().min(1, "Title is required"),
     tags: z.array(z.string()).optional(),
-    
+
 })
 
 
-app.post('/api/vi/signup', async (req, res) => {
+app.post('/api/v1/signup', async (req, res) => {
 
     try {
 
@@ -107,76 +107,76 @@ app.post('/api/vi/signup', async (req, res) => {
 
 })
 
-app.post('/api/vi/signin', async (req, res) => {
-try{
+app.post('/api/v1/signin', async (req, res) => {
+    try {
 
 
-    const username = req.body.username;
-    const password = req.body.password;
+        const username = req.body.username;
+        const password = req.body.password;
 
-    const finduser = await User.findOne({
-        username: username
-    })
+        const finduser = await User.findOne({
+            username: username
+        })
 
-    if (finduser) {
+        if (finduser) {
 
-        let comparePassword = await bcrypt.compare(password,finduser.password);
-        if ( comparePassword){
+            let comparePassword = await bcrypt.compare(password, finduser.password);
+            if (comparePassword) {
 
-            const jwtSecret = process.env.JWT_SECRET;
-            if (!jwtSecret) {
-                throw new Error("JWT_SECRET is required but not found in environment variables");
+                const jwtSecret = process.env.JWT_SECRET;
+                if (!jwtSecret) {
+                    throw new Error("JWT_SECRET is required but not found in environment variables");
+                }
+                const token = jwt.sign({ username: finduser.username }, jwtSecret);
+
+                // localStorage.setItem("token" , token);
+
+                res.status(200).json({
+                    "msg": "Sign in done",
+                    "token": token
+                })
+            } else {
+                res.status(403).json({
+                    "msg": "Incorrect Password"
+                })
             }
-            const token = jwt.sign({ username: finduser.username }, jwtSecret);
-            
-            // localStorage.setItem("token" , token);
-            
-            res.status(200).json({
-                "msg" : "Sign in done",
-                "token" : token
-            })
-        }else{
+        } else {
             res.status(403).json({
-                "msg" : "Incorrect Password"
+                "msg": "user doesn;t exist"
             })
         }
-    }else{
-        res.status(403).json({
-            "msg" : "user doesn;t exist"
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({
+            "msg": "internal server error"
         })
     }
-}catch(e){
-    console.error(e);
-    res.status(500).json({
-        "msg" : "internal server error"
-    })
-}
 })
 
-app.get('/api/vi/profile', authenticateToken, (req: any, res) => {
+app.get('/api/v1/profile', authenticateToken, (req: any, res) => {
     res.json({
         msg: "Protected route accessed",
         user: req.user
     })
 })
 
-app.post('/api/vi/add-content', authenticateToken, async (req: any, res) => {
+app.post('/api/v1/add-content', authenticateToken, async (req: any, res) => {
     try {
         const result = content.safeParse(req.body);
 
         if (result.success) {
             const { contentType, link, title, tags } = result.data;
-            
+
             const newContent = new Content({
                 contentType,
                 link,
                 title,
                 tags: tags || [],
-                userId : req.user.username
+                userId: req.user.username
             });
-            
+
             await newContent.save();
-            
+
             res.status(201).json({
                 msg: "Content added successfully",
                 content: newContent,
@@ -196,24 +196,60 @@ app.post('/api/vi/add-content', authenticateToken, async (req: any, res) => {
     }
 })
 
-app.get('/get-content', authenticateToken,async (req : any,res)=>{
+app.get('/api/v1/get-content', authenticateToken, async (req: any, res) => {
 
     const content = await Content.find({
-        userId : req.user.username
+        userId: req.user.username
     })
 
     res.json({
-        msg : `Content for ${req.user.username}`,
-        content : content
+        msg: `Content for ${req.user.username}`,
+        content: content
     })
 })
 
-app.put('/delete', authenticateToken , async( req : any , res ) =>{
+app.put('/api/v1/deleteAll', authenticateToken, async (req: any, res) => {
     const content = await Content.deleteMany({
-        userId : req.user.username
+        userId: req.user.username
     })
     res.json({
-        msg : "all content deleted"
+        msg: "all content deleted"
     })
 })
 // get content - populate 
+
+app.post('/api/v1/brain/share', authenticateToken, async (req: any, res) => {
+    const share = req.body.share;
+
+    if (share) {
+        const hash = random(10);
+
+        const existingLink = await Link.findOne({
+            userId : req.user.username
+        })
+
+        if (existingLink) {
+            res.json({
+                hash: existingLink.hash
+            })
+        } else {
+            const link = await Link.create({
+                hash: hash,
+                userId: req.user.username
+            })
+
+
+            res.status(201).json({
+                hash: link.hash
+            })
+        }
+    } else {
+        await Link.deleteOne({
+            userId: req.user.username
+        })
+
+        res.json({
+            msg: "link deleted"
+        })
+    }
+})
