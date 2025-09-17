@@ -8,11 +8,13 @@ import * as bcrypt from "bcrypt"
 import jwt from 'jsonwebtoken'
 import authenticateToken from "./middleware/authenticate.js";
 import random from "./utils.js";
+import cors from 'cors'
 
 
 dotenv.config();
 
 app.use(express.json());
+app.use(cors())
 
 // Connect to MongoDB
 async function connectDB() {
