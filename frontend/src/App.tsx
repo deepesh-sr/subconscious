@@ -1,6 +1,6 @@
-import { cx } from "class-variance-authority";
+
 import { Button } from "./components/ui/Button";
-import Signin from "./components/icons/Signin";
+import Signin from "./components/icons/Signin.tsx";
 
 
 function App() {
