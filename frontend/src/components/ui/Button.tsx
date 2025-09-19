@@ -41,7 +41,8 @@ export interface ButtonProps
     VariantProps<typeof button> {
   text: string;
   startIcon?: React.ReactNode; // Icon before text
-  endIcon?: React.ReactNode;   // Icon after text
+  endIcon?: React.ReactNode;  
+  onClick?: ()=>void;  // Icon after text
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -53,11 +54,13 @@ export const Button: React.FC<ButtonProps> = ({
   startIcon,
   endIcon,
   children,
+  onClick,
   ...props
 }) => (
   <button
-    className={button({ intent, size, disabled, className })}
+    className={button({ intent, size, disabled, className})}
     disabled={disabled || undefined}
+    onClick={onClick}
     {...props}
   >
     {startIcon && <span className="flex-shrink-0">{startIcon}</span>}
