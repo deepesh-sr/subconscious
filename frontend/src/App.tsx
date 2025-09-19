@@ -4,6 +4,7 @@ import { Button } from "./components/ui/Button";
 import Card from "./components/ui/Card.tsx";
 import Signin from "./components/icons/Signin.tsx";
 import AddContentModal from "./components/AddContentModal.tsx";
+import Sidebar from "./components/Sidebar.tsx";
 
 
 function App() {
@@ -13,7 +14,7 @@ function App() {
     
     <div className="flex flex-row p-4" >
 
-      <div className="h-screen w-53">Siderbar</div>
+      <div className="h-screen w-53"><Sidebar/></div>
       <div className="flex flex-col w-full">
         <div className="flex  justify-end gap-2">
           <Button 
