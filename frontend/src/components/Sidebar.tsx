@@ -1,4 +1,4 @@
-import Signin from "./icons/Signin"
+import Signin from "./icons/SigninIcon"
 import SideItem from "./ui/SideItem"
 
 const Sidebar = () => {
