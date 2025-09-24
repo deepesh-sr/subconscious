@@ -15,13 +15,14 @@ function Dashboard() {
 
       <div className="h-screen w-53"><Sidebar/></div>
       <div className="flex flex-col w-full">
-        <div className="flex justify-end gap-2 ">
+        <div className="flex justify-end gap-2 bg-gray-50 p-2 ">
           <Button 
             text="AddContent" 
             startIcon={<Signin />}
             onClick={() => setModalOpen(true)}
+            className="rounded-3xl"
           />
-          <Button text="Share" startIcon={<Signin />}></Button>
+          <Button text="Share" className="rounded-3xl" startIcon={<Signin />}></Button>
         </div>
         <div className="border-gray-200 h-screen bg-gray-50 p-3 ">
         <Card
