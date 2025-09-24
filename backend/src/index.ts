@@ -131,7 +131,7 @@ app.post('/api/v1/signin', async (req, res) => {
                 }
                 const token = jwt.sign({ username: finduser.username }, jwtSecret);
 
-                // localStorage.setItem("token" , token);
+            //    if(typeof window !==undefined && window.localStorage) localStorage.setItem("token" , token);
 
                 res.status(200).json({
                     "msg": "Sign in done",
